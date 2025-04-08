@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\CategoriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,9 @@ use App\Http\Controllers\ProductoController;
 
 Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
 Route::get('/productos/{id}', [ProductoController::class, 'show'])->name('productos.show');
+
+Route::get('/categorias', [CategoriaController::class, 'index'])->name('categorias');
+Route::get('/categorias/{id}', [CategoriaController::class, 'show'])->name('show_categorias');
 
 Route::get('/', function () {
     return view('welcome');

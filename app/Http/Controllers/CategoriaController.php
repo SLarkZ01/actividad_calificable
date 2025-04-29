@@ -20,7 +20,7 @@ class CategoriaController extends Controller
      */
     public function create()
     {
-        //
+        return view('crear_categoria');
     }
 
     /**
@@ -28,14 +28,24 @@ class CategoriaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string'
+        ]);
+
+        Categoria::create([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion
+        ]);
+
+        return redirect()->route('categorias')->with('success', 'Categoría creada exitosamente');
     }
 
     /**
      * Display the specified resource.
      */
     public function show($id){
-        $productos = Categoria::findOrFail($id);
+        $categoria = Categoria::findOrFail($id);
         return view("show_categorias",compact("categoria"));
     }
 
@@ -45,7 +55,8 @@ class CategoriaController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $categoria = Categoria::findOrFail($id);
+        return view('editar_categoria', compact('categoria'));
     }
 
     /**
@@ -53,7 +64,18 @@ class CategoriaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string'
+        ]);
+        
+        $categoria = Categoria::findOrFail($id);
+        $categoria->update([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion
+        ]);
+        
+        return redirect()->route('categorias')->with('success', 'Categoría actualizada exitosamente');
     }
 
     /**
@@ -61,6 +83,9 @@ class CategoriaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $categoria = Categoria::findOrFail($id);
+        $categoria->delete();
+        
+        return redirect()->route('categorias')->with('success', 'Categoría eliminada exitosamente');
     }
 }

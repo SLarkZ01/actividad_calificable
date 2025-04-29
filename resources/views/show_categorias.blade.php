@@ -2,14 +2,15 @@
 <html>
 
 <head>
-    <title>Categorias {{ $categorias->id }}</title>
+    <title>Categorias {{ $categoria->id }}</title>
 </head>
 
 <body>
-    <h1>Categorias con id = {{ $categorias->id }}</h1>
+    <h1>Categorias con id = {{ $categoria->id }}</h1>
     <ul>
-        <li>{{ $categorias->nombre }} - {{ $categorias->descripcion }}</li>
+        <li>{{ $categoria->nombre }} - {{ $categoria->descripcion }}</li>
     </ul>
+    <a href="{{ route('categorias') }}">Volver a la lista</a>
 </body>
 
 </html>

@@ -21,7 +21,12 @@ class ApiProductosController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $Productos = Producto::create([
+            'nombre' => $request->input('nombre'),
+            'precio' => $request->input('precio'),
+            'stock' => $request->input('stock')
+        ]);
+        return response()->json($Productos, 201);
     }
 
     /**
@@ -32,7 +37,7 @@ class ApiProductosController extends Controller
         $productos = Producto::find(id: $id);
         if ($productos) {
             return response()->json($productos, 200);
-        }else{
+        } else {
             return response()->json(['error' => 'Producto no encontrado'], 404);
         }
     }
@@ -42,7 +47,14 @@ class ApiProductosController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $producto = Producto::find($id);
+
+        if ($producto) {
+            $producto->update($request->all());
+            return response()->json($producto, 200);
+        } else {
+            return response()->json(['error' => 'Producto no encontrado'], 404);
+        }
     }
 
     /**
@@ -50,6 +62,13 @@ class ApiProductosController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $producto = Producto::find($id);
+
+        if ($producto) {
+            $producto->delete();
+            return response()->json(null, 204);
+        } else {
+            return response()->json(['error' => 'Producto no encontrado'], 404);
+        }
     }
 }

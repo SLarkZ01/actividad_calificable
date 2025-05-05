@@ -9,10 +9,20 @@ class Categoria extends Model
 {
     use HasFactory;
 
-        // Nombre de la tabla
-        protected $table = 'Categorias';
-        // Nombre de la llave primaria
-        protected $primaryKey = 'id';
-        // Define qué columnas pueden ser asignadas masivamente
-        protected $fillable = ['nombre', 'descripcion'];
+    /**
+     * La tabla asociada con el modelo.
+     *
+     * @var string
+     */
+    protected $table = 'categorias';
+
+    /**
+     * Los atributos que son asignables masivamente.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'nombre',
+        'descripcion',
+    ];
 }

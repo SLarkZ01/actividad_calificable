@@ -1,0 +1,403 @@
+\documentclass{article}
+\usepackage{enumitem}
+\usepackage{fullpage}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[scaled=1]{helvet}
+\usepackage[helvet]{sfmath}
+\usepackage[spanish, es-tabla]{babel}
+\everymath={\sf}
+\usepackage{parskip}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=BlueViolet]{hyperref}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{xcolor}
+
+% Configuración para código fuente con colores estilo Laravel/PHP
+\definecolor{laravelPink}{rgb}{0.913, 0.309, 0.541}      % #e94e7f - Rosado Laravel
+\definecolor{laravelOrange}{rgb}{0.957, 0.486, 0.247}    % #f47c3f - Naranja Laravel
+\definecolor{laravelBlue}{rgb}{0.196, 0.592, 0.859}      % #3297db - Azul Laravel
+\definecolor{commentGreen}{rgb}{0.4, 0.6, 0.4}           % Verde para comentarios
+\definecolor{stringColor}{rgb}{0.8, 0.4, 0}              % Naranja/marrón para strings
+\definecolor{backcolour}{rgb}{0.976, 0.980, 0.984}        % #f9fafc - Fondo claro estilo Laravel
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{commentGreen},
+    keywordstyle=\color{laravelPink}\bfseries,
+    numberstyle=\tiny\color{laravelBlue},
+    stringstyle=\color{stringColor},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+% Personalización específica para PHP estilo Laravel
+\lstdefinelanguage{laravelPHP}[]{PHP}{
+    morekeywords={namespace, use, as, extends, implements, trait, abstract, final, private, protected, public, static, function, return, new, if, else, foreach, for, while, do, switch, case, default, break, continue, try, catch, throw, finally, null, true, false},
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]',
+    morestring=[b]",
+    keywordstyle=\color{laravelPink}\bfseries,
+    commentstyle=\color{commentGreen},
+    stringstyle=\color{stringColor},
+    identifierstyle=\color{laravelBlue}, % Variables y nombres de funciones
+    sensitive=true
+}
+
+% Establecer laravelPHP como estilo por defecto para código PHP
+\lstset{language=laravelPHP}
+
+% Configuración de títulos
+\titleformat{\section}
+  {\Large\bfseries\color{BlueViolet}}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\large\bfseries\color{BlueViolet}}{\thesubsection}{1em}{}
+% Ajustes para encabezado
+\setlength{\headheight}{45pt}
+\setlength{\headsep}{20pt}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\includegraphics[height=40pt]{Images/Logo Uniautonoma.png}}
+\chead{\textsf{Universidad Autónoma del Cauca}}
+\rhead{\textsf{}}
+\rfoot{\textsf{\thepage}}
+
+\begin{document}
+%=======================
+% Portada
+%=======================
+\begin{titlepage}
+\centering
+\includegraphics[width=0.4\textwidth]{Images/Logo Uniautonoma.png}\par
+\vspace{1cm}
+{\bfseries\LARGE Universidad Autónoma del Cauca\par}
+\vspace{0.5cm}
+{\scshape\Large Taller de Desarrollo de Aplicaciones Web\par}
+\vspace{0.5cm}
+{\scshape\Huge API REST para Gestión de Categorías\par}
+\vspace{1cm}
+{\itshape\LARGE Laravel Framework\par}
+\vspace{1.5cm}
+{\Large \textbf{Autor:} \\ Thomas Montoya Magon\par}
+\vspace{0.5cm}
+{\Large \textbf{Docente:} \\ Ana Gabriela Fernandez Morantes\par}
+\vfill
+{\Large Martes, 6 de mayo del 2025\par}
+\end{titlepage}
+
+%=======================
+% Índice
+%=======================
+\clearpage
+\pagestyle{plain}
+\tableofcontents
+\clearpage
+\pagestyle{fancy}
+
+%=======================
+% Contenido
+%=======================
+\section{Introducción}
+
+Este informe detalla el desarrollo de una API REST para la gestión de categorías utilizando el framework Laravel. La implementación sigue los principios de arquitectura RESTful, permitiendo realizar operaciones CRUD (Crear, Leer, Actualizar y Eliminar) sobre las categorías a través de endpoints HTTP.
+
+\section{Desarrollo del Proyecto}
+
+\subsection{Creación de la Migración para la Tabla categorias}
+
+Para crear la estructura de la base de datos, se implementó una migración que define la tabla \texttt{categorias} con los campos requeridos: \texttt{id}, \texttt{nombre} y \texttt{descripcion}.
+
+\begin{lstlisting}[language=laravelPHP, caption=Migración para la tabla categorias]
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('categorias', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre');
+            $table->text('descripcion')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('categorias');
+    }
+};
+\end{lstlisting}
+
+Para aplicar la migración a la base de datos, se ejecutó el siguiente comando:
+
+\begin{lstlisting}[language=bash]
+php artisan migrate
+\end{lstlisting}
+
+\subsection{Creación del Modelo Categoria}
+
+Se implementó el modelo \texttt{Categoria} que representa la entidad en la base de datos y gestiona las interacciones con la tabla \texttt{categorias}.
+
+\begin{lstlisting}[language=laravelPHP, caption=Modelo Categoria]
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Categoria extends Model
+{
+    use HasFactory;
+
+    /**
+     * La tabla asociada con el modelo.
+     *
+     * @var string
+     */
+    protected $table = 'categorias';
+
+    /**
+     * Los atributos que son asignables masivamente.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'nombre',
+        'descripcion',
+    ];
+}
+\end{lstlisting}
+
+\subsection{Creación del Controlador API para Categoria}
+
+Se desarrolló el controlador \texttt{ApiCategoriaController} que implementa los métodos necesarios para gestionar las operaciones CRUD a través de la API.
+
+\begin{lstlisting}[language=laravelPHP, caption=ApiCategoriaController]
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Categoria;
+use Illuminate\Http\Request;
+
+class ApiCategoriaController extends Controller
+{
+    /**
+     * Mostrar un listado de todas las categorías.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index()
+    {
+        $categorias = Categoria::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => $categorias
+        ]);
+    }
+
+    /**
+     * Almacenar una nueva categoría en la base de datos.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string'
+        ]);
+
+        $categoria = Categoria::create($request->all());
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Categoría creada exitosamente',
+            'data' => $categoria
+        ], 201);
+    }
+
+    /**
+     * Mostrar una categoría específica.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show($id)
+    {
+        $categoria = Categoria::findOrFail($id);
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => $categoria
+        ]);
+    }
+
+    /**
+     * Actualizar una categoría específica en la base de datos.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'string|max:255',
+            'descripcion' => 'nullable|string'
+        ]);
+
+        $categoria = Categoria::findOrFail($id);
+        $categoria->update($request->all());
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Categoría actualizada exitosamente',
+            'data' => $categoria
+        ]);
+    }
+
+    /**
+     * Eliminar una categoría específica de la base de datos.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id)
+    {
+        $categoria = Categoria::findOrFail($id);
+        $categoria->delete();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Categoría eliminada exitosamente'
+        ]);
+    }
+}
+\end{lstlisting}
+
+\subsection{Creación de Rutas de la API para Categoria}
+
+Se configuraron las rutas en el archivo \texttt{routes/api.php} para definir los endpoints de la API que permiten el acceso a las funcionalidades implementadas en el controlador.
+
+\begin{lstlisting}[language=laravelPHP, caption=Rutas para la API de Categorías]
+// Rutas para Categorias
+Route::get('/categorias', [App\Http\Controllers\ApiCategoriaController::class, 'index']);
+Route::post('/categorias', [App\Http\Controllers\ApiCategoriaController::class, 'store']);
+Route::get('/categorias/{id}', [App\Http\Controllers\ApiCategoriaController::class, 'show']);
+Route::put('/categorias/{id}', [App\Http\Controllers\ApiCategoriaController::class, 'update']);
+Route::delete('/categorias/{id}', [App\Http\Controllers\ApiCategoriaController::class, 'destroy']);
+\end{lstlisting}
+
+\section{Pruebas de la API}
+
+Se realizaron pruebas utilizando Postman para verificar el correcto funcionamiento de la API.
+
+\subsection{GET /api/categorias}
+
+Esta ruta devuelve todas las categorías almacenadas en la base de datos.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{Images/get_categorias.png}
+\caption{Resultado de la petición GET a /api/categorias}
+\end{figure}
+
+\subsection{POST /api/categorias}
+
+Esta ruta permite crear una nueva categoría enviando los datos requeridos en formato JSON.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{Images/post_categorias.png}
+\caption{Resultado de la petición POST a /api/categorias}
+\end{figure}
+
+\subsection{GET /api/categorias/\{id\}}
+
+Esta ruta devuelve los detalles de una categoría específica según su ID.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{Images/get_categoria_id.png}
+\caption{Resultado de la petición GET a /api/categorias/1}
+\end{figure}
+
+\subsection{PUT /api/categorias/\{id\}}
+
+Esta ruta permite actualizar una categoría existente enviando los datos a modificar en formato JSON.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{Images/put_categoria_id.png}
+\caption{Resultado de la petición PUT a /api/categorias/1}
+\end{figure}
+
+\subsection{DELETE /api/categorias/\{id\}}
+
+Esta ruta permite eliminar una categoría específica según su ID.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{Images/delete_categoria_id.png}
+\caption{Resultado de la petición DELETE a /api/categorias/1}
+\end{figure}
+
+\section{Conclusiones}
+
+La implementación de la API REST para la gestión de categorías utilizando Laravel ha demostrado la facilidad y eficiencia que ofrece este framework para el desarrollo de aplicaciones web modernas. Gracias a las herramientas proporcionadas por Laravel, se logró:
+
+\begin{itemize}
+  \item Crear una estructura de base de datos clara y bien definida mediante migraciones.
+  \item Implementar un modelo que facilita la interacción con la base de datos.
+  \item Desarrollar un controlador que gestiona las peticiones HTTP de manera efectiva.
+  \item Definir rutas claras y RESTful para acceder a los recursos.
+\end{itemize}
+
+La API desarrollada cumple con los principios de diseño REST, proporcionando endpoints intuitivos para realizar operaciones CRUD sobre las categorías. Esta implementación puede servir como base para futuras ampliaciones del sistema.
+
+\section{Referencias}
+
+\begin{itemize}
+  \item Laravel Documentation (2025). Eloquent ORM. \url{https://laravel.com/docs/10.x/eloquent}
+  \item Laravel Documentation (2025). Controllers. \url{https://laravel.com/docs/10.x/controllers}
+  \item Laravel Documentation (2025). Migrations. \url{https://laravel.com/docs/10.x/migrations}
+  \item Laravel Documentation (2025). API Resources. \url{https://laravel.com/docs/10.x/eloquent-resources}
+\end{itemize}
+
+\section{Enlace del Repositorio}
+
+El código fuente completo del proyecto está disponible en el siguiente repositorio de GitHub:
+
+\url{https://github.com/[tu-usuario]/actividad-calificable-laravel}
+
+\end{document}

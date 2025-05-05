@@ -27,6 +27,3 @@ Route::get('/categorias/{id}/editar', [CategoriaController::class, 'edit'])->nam
 Route::put('/categorias/{id}', [CategoriaController::class, 'update'])->name('categorias.update');
 Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy'])->name('categorias.destroy');
 
-Route::get('/', function () {
-    return view('welcome');
-});

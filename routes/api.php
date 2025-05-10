@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiProductosController;
 use App\Http\Controllers\ApiCategoriaController;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,18 +17,25 @@ use App\Http\Controllers\ApiCategoriaController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Rutas de autenticación
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::get('me', [AuthController::class, 'me']);
 });
 
-// Rutas para Categorias
-Route::get('/categorias', [ApiCategoriaController::class, 'index']);
-Route::post('/categorias', [ApiCategoriaController::class, 'store']);
-Route::get('/categorias/{id}', [ApiCategoriaController::class, 'show']);
-Route::put('/categorias/{id}', [ApiCategoriaController::class, 'update']);
-Route::delete('/categorias/{id}', [ApiCategoriaController::class, 'destroy']);
+// Rutas protegidas para Categorias
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('/categorias', [ApiCategoriaController::class, 'index']);
+    Route::post('/categorias', [ApiCategoriaController::class, 'store']);
+    Route::get('/categorias/{id}', [ApiCategoriaController::class, 'show']);
+    Route::put('/categorias/{id}', [ApiCategoriaController::class, 'update']);
+    Route::delete('/categorias/{id}', [ApiCategoriaController::class, 'destroy']);
+});
 
-// Rutas para Productos
+// Rutas para Productos (sin protección para este ejercicio)
 Route::get('/productos', [ApiProductosController::class, 'index']);
 Route::post('/productos', [ApiProductosController::class, 'store']);
 Route::get('/productos/{id}', [ApiProductosController::class, 'show']);
